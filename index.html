@@ -1,0 +1,1077 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stable Syntax — websites for businesses of every size</title>
+<meta name="description" content="Stable Syntax builds custom websites for small, growing and established businesses: web development, interface design, responsive builds, performance, search optimisation and brand design.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" type="image/png" href="img/Stable%20Syntax%20Logo.png">
+<!-- Single value, no prefers-color-scheme media. The theme is owned by
+     data-theme and localStorage, deliberately decoupled from the OS, so keying
+     the browser chrome to the OS would light-chrome a dark page for anyone whose
+     choice differs from their system. The script below and paintTheme() in
+     app.js keep this in step with the real theme instead. -->
+<meta name="theme-color" content="#08090D" id="theme-color">
+
+<script>
+  // Resolve the theme before first paint so there is no flash of the wrong mode.
+  // Dark is the identity, so it is the default for a first-time visitor rather
+  // than a fallback. A returning visitor's own choice always wins. To follow the
+  // OS instead, swap the fallback for:
+  //   matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+  (function () {
+    var theme = 'dark';
+    try {
+      theme = localStorage.getItem('ss-theme') || 'dark';
+    } catch (e) { /* private mode */ }
+    document.documentElement.dataset.theme = theme;
+    // Kept in sync here as well as in app.js so the chrome is already correct on
+    // the first paint, before app.js has parsed.
+    document.getElementById('theme-color')
+      .setAttribute('content', theme === 'light' ? '#F6F8FC' : '#08090D');
+  })();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<!-- Geist Mono, not IBM Plex Mono: --f-mono in styles.css asks for Geist Mono,
+     so loading anything else downloads a family the page never renders and
+     silently drops every label to the Consolas fallback. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@500..800&family=Manrope:wght@300..700&family=Geist+Mono:wght@400..600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- The whole page sits on one slow-drifting mesh. Fixed, so scrolling reads as
+     movement through a single continuous field rather than past four separate
+     backgrounds. -->
+<div class="mesh" aria-hidden="true">
+  <span class="mesh__field mesh__field--azure"></span>
+  <span class="mesh__field mesh__field--aqua"></span>
+  <span class="mesh__field mesh__field--ember"></span>
+  <span class="mesh__grain"></span>
+</div>
+
+<!-- Custom cursor. Inert until app.js builds it and adds .has-cursor to <html>,
+     so the native pointer is never hidden by CSS alone — a script failure can
+     leave the page without a cursor otherwise. Fine pointers only. -->
+<div class="cursor" aria-hidden="true"></div>
+<div class="cursor__dot" aria-hidden="true"></div>
+
+<!-- Sentinel for the nav condense. An IntersectionObserver watches this instead
+     of listening to scroll. -->
+<div id="top-sentinel" aria-hidden="true"></div>
+
+<header class="nav" id="nav">
+  <div class="nav__inner shell">
+    <a class="brand" href="#main">
+      <img class="brand__mark" src="img/Stable%20Syntax%20Logo.png" width="1536" height="1024" alt="" aria-hidden="true">
+      <span class="brand__word">Stable&nbsp;Syntax</span>
+    </a>
+
+    <div class="nav__end">
+      <button class="iconbtn themebtn" type="button" id="themebtn">
+        <span class="themebtn__icon" aria-hidden="true">
+          <svg class="themebtn__sun" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.6"/>
+            <path d="M12 2.6v2.2M12 19.2v2.2M21.4 12h-2.2M4.8 12H2.6M18.6 5.4l-1.6 1.6M7 17l-1.6 1.6M18.6 18.6 17 17M7 7 5.4 5.4"
+                  stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <svg class="themebtn__moon" viewBox="0 0 24 24" fill="none">
+            <path d="M20 14.2A8.4 8.4 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2Z"
+                  stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <!-- The label carries the state on its own, so no aria-pressed: a toggle
+             button that both renames itself AND reports pressed announces the
+             state twice, in opposite directions. -->
+        <span class="u-sr" id="themebtn-text">Switch to light mode</span>
+      </button>
+
+      <a class="btn btn--primary nav__cta" href="#contact">
+        <span>Start a project</span>
+        <svg class="btn__arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M5 12h13M12.5 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+
+      <!-- Only ever visible below 900px, where .nav__links becomes a panel. -->
+      <button class="iconbtn menubtn" type="button" id="menubtn"
+              aria-expanded="false" aria-controls="nav-links">
+        <span class="menubtn__box" aria-hidden="true">
+          <span class="menubtn__bar"></span>
+          <span class="menubtn__bar"></span>
+        </span>
+        <span class="u-sr" id="menubtn-text">Open menu</span>
+      </button>
+    </div>
+
+    <!-- After .nav__end in the DOM so the panel follows its own trigger in tab
+         order; `order` puts it back to the left of the buttons on desktop. -->
+    <nav class="nav__links" id="nav-links" aria-label="Sections">
+      <a href="#projects">Work</a>
+      <a href="#services">Services</a>
+      <a href="#about">About</a>
+      <a href="#process">Process</a>
+      <a class="nav__links-extra" href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ======================= HERO ======================= -->
+  <section class="hero section--bg">
+
+    <!-- The work, drawn rather than photographed: a page being laid out. Sits
+         under the WebGL field, so the hero still has substance on the many
+         machines where WebGL is unavailable. -->
+    <div class="backdrop backdrop--blueprint" aria-hidden="true">
+      <svg class="backdrop__art" viewBox="0 0 1600 900" fill="none"
+           preserveAspectRatio="xMidYMid slice">
+        <g stroke="currentColor" stroke-width="2">
+          <!-- browser frame, mid-build -->
+          <rect x="806" y="150" width="660" height="450" rx="16"/>
+          <path d="M806 206h660"/>
+          <circle cx="838" cy="178" r="6"/><circle cx="862" cy="178" r="6"/><circle cx="886" cy="178" r="6"/>
+          <rect x="838" y="236" width="286" height="168" rx="8"/>
+          <path d="M838 440h250M838 470h316M838 500h192" stroke-linecap="round"/>
+          <rect x="838" y="530" width="132" height="38" rx="19"/>
+          <!-- the column grid it is built on -->
+          <path d="M1160 236v332M1244 236v332M1328 236v332M1412 236v332" stroke-width="1" opacity=".5"/>
+          <!-- a component being placed -->
+          <rect x="1188" y="262" width="240" height="122" rx="8"/>
+          <path d="M1212 410h190M1212 436h140" stroke-linecap="round"/>
+          <!-- code brackets -->
+          <path d="M236 622l-46 44 46 44M330 622l46 44-46 44" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M266 736l34-116" stroke-linecap="round"/>
+          <!-- a card, lower left -->
+          <rect x="150" y="196" width="332" height="212" rx="14"/>
+          <path d="M182 254h150M182 288h230M182 322h180" stroke-linecap="round"/>
+          <circle cx="196" cy="220" r="9"/>
+        </g>
+      </svg>
+    </div>
+
+    <!-- WebGL field. Sits over the CSS mesh and takes the hero's share of it.
+         If Three.js is blocked, WebGL is unavailable, or motion is reduced, the
+         canvas never initialises and the CSS mesh is simply left alone. -->
+    <canvas class="hero__canvas" id="scene" aria-hidden="true"></canvas>
+
+    <div class="shell">
+
+      <p class="eyebrow reveal" data-reveal-delay="0">
+        <span class="eyebrow__dot" aria-hidden="true"></span>
+        Web development studio — taking on new projects
+      </p>
+
+      <h1 class="hero__title" id="hero-title" data-split>
+        We build websites for businesses of <em>every size.</em>
+      </h1>
+
+      <div class="hero__lower">
+        <p class="hero__sub reveal" data-reveal-delay="120">
+          A first site for a new business, or a platform a large team runs on.
+          Stable Syntax designs it, builds it, and keeps it fast after launch.
+        </p>
+
+        <div class="hero__actions reveal" data-reveal-delay="200">
+          <a class="btn btn--primary btn--lg" href="#contact" data-magnetic>
+            <span>Start a project</span>
+            <svg class="btn__arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 12h13M12.5 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+          <a class="btn btn--ghost btn--lg" href="#services">
+            <span>See what we do</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Three trust signals, stated as numbers rather than adjectives.
+
+           PLACEHOLDER — REPLACE BEFORE LAUNCH.
+           These three are deliberately not invented: each one is a fact already
+           published on stablesyntax.com, so the page claims nothing today that
+           the business is not already claiming. That makes them safe to ship,
+           not good. They describe how the studio is set up, not what it has
+           achieved, and none of them is the reason anyone hires anybody.
+
+           Swap them for outcomes as soon as you have figures you can stand
+           behind — projects delivered, a client-visible result, years running.
+           A number about your work beats a number about your process. -->
+      <ul class="stats reveal" data-reveal-delay="300">
+        <li class="stat card">
+          <span class="stat__value"><span data-count="24">24</span><span class="stat__unit">hrs</span></span>
+          <span class="stat__label">Every project enquiry answered, not just the ones we take</span>
+        </li>
+        <li class="stat card">
+          <span class="stat__value"><span data-count="6">6</span></span>
+          <span class="stat__label">Services under one roof, from development to brand design</span>
+        </li>
+        <li class="stat card">
+          <span class="stat__value stat__value--type">4&nbsp;STEPS</span>
+          <span class="stat__label">Idea to launch, the same whatever the size of the build</span>
+        </li>
+      </ul>
+
+    </div>
+  </section>
+
+  <!-- ======================= TRUST MARQUEE ======================= -->
+  <!-- Placeholder content: invented brands with geometric monograms rather than
+       borrowed real logos. -->
+  <section class="marquee-wrap" aria-label="Selected clients">
+    <p class="marquee__caption">Trusted by teams at</p>
+    <div class="marquee" data-marquee>
+      <ul class="marquee__row">
+        <li class="marquee__item">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h13M8 15h13"/></svg>Ledgerline
+        </li>
+        <li class="marquee__item">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.4"/><path d="M8 13.5l4-4 4 4"/></svg>Kestrel Health
+        </li>
+        <li class="marquee__item">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9.2" cy="12" r="5.6"/><circle cx="14.8" cy="12" r="5.6"/></svg>Osmo
+        </li>
+        <li class="marquee__item">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="7.2" width="8.4" height="9.6" rx="1"/><rect x="12.4" y="7.2" width="8.4" height="9.6" rx="1"/></svg>Tandem Freight
+        </li>
+        <li class="marquee__item">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.2 4h10.6l5 5v11H4.2z"/><path d="M14.8 4v5h5"/></svg>Fieldnote
+        </li>
+        <li class="marquee__item">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 15a8 8 0 0116 0"/><path d="M2 19h20"/></svg>Bright Harbor
+        </li>
+        <li class="marquee__item">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.4 20.4 18H3.6z"/></svg>Northform
+        </li>
+        <li class="marquee__item">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V8.5L12 4l7 4.5V19"/><path d="M9.5 19v-5h5v5"/></svg>Almanac Bank
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ======================= SELECTED WORK ======================= -->
+  <!-- Replace each sample image, title, description and example.com URL with
+       the final project details before launch. -->
+  <section class="section work" id="projects">
+    <div class="shell">
+
+      <header class="work__intro reveal">
+        <h2 class="work__title">A closer look at the work.</h2>
+        <p class="work__lede">
+          Six spaces for the ideas, craft and details behind the websites we make.
+        </p>
+      </header>
+
+      <ol class="work__list">
+        <li class="work__item reveal">
+          <figure class="work__preview">
+            <div class="work__browser">
+              <div class="work__browserbar" aria-hidden="true">
+                <span></span><span></span><span></span>
+                <span class="work__browser-label">Horizon Wheels — Car Dealership</span>
+              </div>
+              <div class="work__screen work__screen--wide">
+                <img src="img/Horizon%20Wheels.png"
+                     width="1904" height="991" loading="lazy" decoding="async"
+                     alt="Screenshot of the Horizon Wheels car dealership website.">
+              </div>
+            </div>
+          </figure>
+          <div class="work__copy animate-left">
+            <p class="work__number">01 <span>—</span> PROJECT</p>
+            <h3 class="work__name">Horizon Wheels</h3>
+            <p class="work__description">A premium car dealership website showcasing luxury vehicles, current offers, and test-drive bookings.</p>
+            <a class="work__link" href="https://horizonwheels.infinityfree.me" target="_blank" rel="noopener noreferrer">
+              <span>View live demo</span>
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </div>
+        </li>
+
+        <li class="work__item reveal" data-reveal-delay="80">
+          <figure class="work__preview">
+            <div class="work__browser">
+              <div class="work__browserbar" aria-hidden="true">
+                <span></span><span></span><span></span>
+                <span class="work__browser-label">Peace's Kitchen — Nigerian food delivery</span>
+              </div>
+              <div class="work__screen work__screen--wide">
+                <img src="img/Peace%20Kitchen.png"
+                     width="1896" height="987" loading="lazy" decoding="async"
+                     alt="Screenshot of Peace's Kitchen, featuring Nigerian meals and Abuja delivery.">
+              </div>
+            </div>
+          </figure>
+          <div class="work__copy">
+            <p class="work__number">02 <span>—</span> PROJECT</p>
+            <h3 class="work__name">Peace's Kitchen</h3>
+            <p class="work__description">A welcoming storefront for authentic Nigerian home-cooked meals in Abuja, with menu highlights, delivery details and a direct WhatsApp ordering path.</p>
+            <a class="work__link" href="https://peacekitchen.infinityfree.me" target="_blank" rel="noopener noreferrer">
+              <span>View live demo</span>
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </div>
+        </li>
+
+        <li class="work__item reveal" data-reveal-delay="80">
+          <figure class="work__preview">
+            <div class="work__browser">
+              <div class="work__browserbar" aria-hidden="true">
+                <span></span><span></span><span></span>
+                <span class="work__browser-label">Kaira — Fashion Store</span>
+              </div>
+              <div class="work__screen work__screen--wide">
+                <img src="img/Kaira.png"
+                     width="1902" height="984" loading="lazy" decoding="async"
+                     alt="Screenshot of Kaira fashion store, showing seasonal clothing collections.">
+              </div>
+            </div>
+          </figure>
+          <div class="work__copy">
+            <p class="work__number">03 <span>—</span> PROJECT</p>
+            <h3 class="work__name">Kaira</h3>
+            <p class="work__description">A fashion storefront showcasing seasonal collections, new arrivals and bestsellers, with product categories, style-focused editorial content and a newsletter sign-up.</p>
+            <a class="work__link" href="https://kairanet.netlify.app" target="_blank" rel="noopener noreferrer">
+              <span>View live demo</span>
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </div>
+        </li>
+
+        <li class="work__item reveal" data-reveal-delay="80">
+          <figure class="work__preview">
+            <div class="work__browser">
+              <div class="work__browserbar" aria-hidden="true">
+                <span></span><span></span><span></span>
+                <span class="work__browser-label">Clinic — Healthcare</span>
+              </div>
+              <div class="work__screen work__screen--wide">
+                <img src="img/Clinic606.png"
+                     width="1898" height="990" loading="lazy" decoding="async"
+                     alt="Screenshot of the Clinic healthcare website, highlighting medical services and appointment booking.">
+              </div>
+            </div>
+          </figure>
+          <div class="work__copy">
+            <p class="work__number">04 <span>—</span> PROJECT</p>
+            <h3 class="work__name">Clinic</h3>
+            <p class="work__description">A healthcare website presenting medical departments, specialist profiles and patient services, with clear paths to find a doctor, book an appointment and access emergency care.</p>
+            <a class="work__link" href="https://clinic606.netlify.app/" target="_blank" rel="noopener noreferrer">
+              <span>View live demo</span>
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </div>
+        </li>
+
+        <li class="work__item reveal" data-reveal-delay="80">
+          <figure class="work__preview">
+            <div class="work__browser">
+              <div class="work__browserbar" aria-hidden="true">
+                <span></span><span></span><span></span>
+                <span class="work__browser-label">Prime Tech — Electronics Store</span>
+              </div>
+              <div class="work__screen work__screen--wide">
+                <img src="img/PrimeTech.png"
+                     width="1907" height="998" loading="lazy" decoding="async"
+                     alt="Screenshot of the Prime Tech electronics store featuring an iPhone promotion and gadgets.">
+              </div>
+            </div>
+          </figure>
+          <div class="work__copy">
+            <p class="work__number">05 <span>—</span> PROJECT</p>
+            <h3 class="work__name">Prime Tech</h3>
+            <p class="work__description">An electronics storefront featuring smartphones, laptops, gaming gear and accessories, with featured product listings, special offers and store benefits like shipping and returns.</p>
+            <a class="work__link" href="https://primetech.infinityfree.me/" target="_blank" rel="noopener noreferrer">
+              <span>View live demo</span>
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </div>
+        </li>
+
+        <li class="work__item reveal" data-reveal-delay="80">
+          <figure class="work__preview">
+            <div class="work__browser">
+              <div class="work__browserbar" aria-hidden="true">
+                <span></span><span></span><span></span>
+                <span class="work__browser-label">Villa — Real Estate</span>
+              </div>
+              <div class="work__screen work__screen--wide">
+                <img src="img/Villa.png"
+                     width="1902" height="991" loading="lazy" decoding="async"
+                     alt="Screenshot of Villa Agency's property website featuring a luxury home and listings.">
+              </div>
+            </div>
+          </figure>
+          <div class="work__copy">
+            <p class="work__number">06 <span>—</span> PROJECT</p>
+            <h3 class="work__name">Villa Agency</h3>
+            <p class="work__description">A real-estate website showcasing luxury villas, apartments and penthouses, with property details, featured deals and options to schedule a viewing or contact an agent.</p>
+            <a class="work__link" href="https://villagency.netlify.app" target="_blank" rel="noopener noreferrer">
+              <span>View live demo</span>
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+          </div>
+        </li>
+      </ol>
+
+    </div>
+  </section>
+
+  <!-- ======================= SERVICES ======================= -->
+  <!-- The six services listed on stablesyntax.com, and only those six.
+
+       Written for a business owner, not a developer. The headings say what the
+       customer gets rather than what the service is called in the trade, so the
+       mapping back to the live site's names is:
+
+         Building your website   -> Web Development
+         How it looks and works  -> User Interface Design
+         Works on every phone    -> Responsive Web Design
+         Pages that load fast    -> Performance Optimization
+         Getting found on Google -> Search Engine Optimization
+         Your look, kept the same-> Brand Design
+
+       No jargon on purpose: no "markup", "render path", "responsive", "assets".
+       If a term would send someone to a search engine to understand your own
+       services page, it does not belong here.
+
+       Layout: 7+5 / 4+4+4 / 12. -->
+  <section class="section" id="services">
+    <div class="shell">
+
+      <header class="head">
+        <p class="head__index reveal">01 — Services</p>
+        <h2 class="head__title reveal" data-reveal-delay="80">
+          Your website is the job. Everything else supports it.
+        </h2>
+        <p class="head__body reveal" data-reveal-delay="160">
+          Whether you need five pages or five hundred, the work is the same —
+          there is just more of it. Everything here either builds your website
+          or keeps it working once it is live.
+        </p>
+      </header>
+
+      <div class="bento">
+
+        <article class="bento__cell bento__cell--lead card reveal">
+          <div class="bento__glow" aria-hidden="true"></div>
+          <span class="bento__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M9 8 5 12l4 4M15 8l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <h3 class="bento__title bento__title--lead">Building your website</h3>
+          <p class="bento__text">
+            The main thing we do, at whatever size your business needs it. We
+            build your site to fit how you actually work, rather than forcing it
+            into a ready-made template designed for someone else. It does what
+            you need, it opens quickly, and it can grow as you grow — so you are
+            not paying to start again in two years.
+          </p>
+          <ul class="chips">
+            <li class="chip">Small businesses</li>
+            <li class="chip">Growing companies</li>
+            <li class="chip">Large organisations</li>
+            <li class="chip">Online shops</li>
+          </ul>
+        </article>
+
+        <article class="bento__cell bento__cell--image card reveal" data-reveal-delay="80">
+          <div class="bento__media">
+            <img src="https://picsum.photos/seed/stable-syntax-interface-layouts/900/700"
+                 width="900" height="700" loading="lazy" decoding="async" data-parallax
+                 alt="Website page layouts spread across a desk.">
+            <span class="media__veil" aria-hidden="true"></span>
+          </div>
+          <div class="bento__pad">
+            <h3 class="bento__title">How it looks and works</h3>
+            <p class="bento__text">
+              We decide what each page shows and where everything sits, so a
+              visitor finds what they came for without having to think about it.
+            </p>
+          </div>
+        </article>
+
+        <article class="bento__cell card reveal" data-reveal-delay="120">
+          <span class="bento__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <rect x="2.6" y="4.6" width="12.4" height="9.4" rx="1.6" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M8.8 14v3.4M5.8 17.4h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <rect x="16.6" y="8.4" width="4.8" height="11" rx="1.4" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+          </span>
+          <h3 class="bento__title">Works on every phone</h3>
+          <p class="bento__text">
+            Most people will visit your site on a phone, not a computer. We check
+            yours on both, and on tablets in between, so you never lose a
+            customer to a page that will not fit their screen.
+          </p>
+        </article>
+
+        <article class="bento__cell card reveal" data-reveal-delay="160">
+          <span class="bento__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4 17.4a8.4 8.4 0 1 1 16 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M12 17.4 16.4 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <h3 class="bento__title">Pages that open fast</h3>
+          <p class="bento__text">
+            People give up on a slow website, and search engines push it further
+            down the results. We work out what is actually slowing yours down and
+            fix that, instead of guessing.
+          </p>
+        </article>
+
+        <article class="bento__cell card reveal" data-reveal-delay="200">
+          <span class="bento__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="10.6" cy="10.6" r="6.4" stroke="currentColor" stroke-width="1.6"/>
+              <path d="m15.4 15.4 4.4 4.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M8.2 12.2v-1.8M10.6 12.2V9M13 12.2V7.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <h3 class="bento__title">Getting found on Google</h3>
+          <p class="bento__text">
+            We set your site up so search engines can tell what your business
+            does and show it to people looking for it. What we will not do is
+            promise you the top spot — nobody can honestly promise that.
+          </p>
+        </article>
+
+        <article class="bento__cell bento__cell--full card reveal" data-reveal-delay="240">
+          <span class="bento__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M4.6 15.4 15.4 4.6a2.1 2.1 0 0 1 3 3L7.6 18.4a2.1 2.1 0 0 1-3-3Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+              <path d="m13.4 6.6 3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <h3 class="bento__title">Your look, kept the same everywhere</h3>
+          <p class="bento__text">
+            Your logo, your colours, and simple rules for using them. So your
+            website, your invoices and your social posts all look like they came
+            from the same business — whether we made them or you did.
+          </p>
+          <ul class="chips">
+            <li class="chip">Logo</li>
+            <li class="chip">Colours and fonts</li>
+            <li class="chip">A simple brand guide</li>
+            <li class="chip">Cards and flyers</li>
+          </ul>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= ABOUT ======================= -->
+  <!-- The About section from stablesyntax.com, rewritten in plain language like
+       the services above. The four points and three values map one-to-one:
+
+         Experienced designers and developers -> Expert team of certified developers
+         Short stages                         -> Agile development methodology
+         One point of contact                 -> End-to-end project management
+         We stay on after launch              -> Post-launch support and maintenance
+
+         Quality first          -> Quality First
+         We work with you       -> Collaborative Approach
+         We have done it before -> Proven Expertise
+
+       NOTE: the live site says "certified developers". That is a specific,
+       checkable claim and it is not repeated here — if the team does hold named
+       certifications, say which ones and put it back; if not, leave it out. -->
+  <section class="section section--bg" id="about">
+
+    <!-- Layouts at several sizes — the "every size" claim, drawn. -->
+    <div class="backdrop backdrop--blueprint" aria-hidden="true">
+      <svg class="backdrop__art" viewBox="0 0 1600 900" fill="none"
+           preserveAspectRatio="xMidYMid slice">
+        <g stroke="currentColor" stroke-width="2">
+          <!-- desktop -->
+          <rect x="112" y="186" width="452" height="290" rx="12"/>
+          <path d="M112 228h452"/>
+          <rect x="140" y="256" width="180" height="104" rx="6"/>
+          <path d="M140 390h150M140 416h206M348 256h188M348 288h188M348 320h140" stroke-linecap="round"/>
+          <path d="M112 506h452" stroke-width="1" opacity=".45"/>
+          <path d="M300 476v42M244 518h112" stroke-linecap="round"/>
+          <!-- tablet -->
+          <rect x="640" y="232" width="238" height="318" rx="12"/>
+          <path d="M640 268h238"/>
+          <rect x="666" y="292" width="186" height="96" rx="6"/>
+          <path d="M666 412h140M666 438h186M666 464h108" stroke-linecap="round"/>
+          <!-- phone -->
+          <rect x="944" y="268" width="146" height="282" rx="16"/>
+          <path d="M990 288h54" stroke-linecap="round"/>
+          <rect x="968" y="312" width="98" height="72" rx="6"/>
+          <path d="M968 406h84M968 428h98M968 450h62" stroke-linecap="round"/>
+          <!-- the shared system underneath them -->
+          <path d="M1172 300h300M1172 348h300M1172 396h300" stroke-width="1" opacity=".5"/>
+          <circle cx="1196" cy="300" r="10"/><circle cx="1196" cy="348" r="10"/><circle cx="1196" cy="396" r="10"/>
+          <path d="M1196 310v28M1196 358v28" stroke-linecap="round"/>
+          <rect x="1272" y="470" width="200" height="104" rx="10"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="shell">
+
+      <header class="head">
+        <p class="head__index reveal">02 — About</p>
+        <h2 class="head__title reveal" data-reveal-delay="80">
+          Who you would actually be working with.
+        </h2>
+        <p class="head__body reveal" data-reveal-delay="160">
+          We are a team of designers and developers who build websites for
+          businesses. The technology is our problem, not yours — what you should
+          get out of it is something that works, brings in customers, and keeps
+          doing both after we hand it over.
+        </p>
+      </header>
+
+      <ul class="about__list reveal" data-reveal-delay="220">
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="8.6" stroke="currentColor" stroke-width="1.6"/>
+            <path d="m8.4 12.2 2.6 2.6 4.8-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Designers and developers who have built this before
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="8.6" stroke="currentColor" stroke-width="1.6"/>
+            <path d="m8.4 12.2 2.6 2.6 4.8-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          We work in short stages, so you see progress as it happens
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="8.6" stroke="currentColor" stroke-width="1.6"/>
+            <path d="m8.4 12.2 2.6 2.6 4.8-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          One person to talk to, from first conversation to launch
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="8.6" stroke="currentColor" stroke-width="1.6"/>
+            <path d="m8.4 12.2 2.6 2.6 4.8-5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          We stay on afterwards to keep everything updated and working
+        </li>
+      </ul>
+
+      <div class="bento">
+
+        <article class="bento__cell card reveal" data-reveal-delay="120">
+          <span class="bento__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 3.4 4.9 6.3v5c0 4.2 2.9 8.1 7.1 9.3 4.2-1.2 7.1-5.1 7.1-9.3v-5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+              <path d="m9.2 11.9 2.2 2.2 3.8-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <h3 class="bento__title">Quality first</h3>
+          <p class="bento__text">
+            We would rather take a little longer than hand over something that
+            only looks finished.
+          </p>
+        </article>
+
+        <article class="bento__cell card reveal" data-reveal-delay="160">
+          <span class="bento__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="9.2" cy="8.6" r="3" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M3.8 19a5.4 5.4 0 0 1 10.8 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M16.2 6a3 3 0 0 1 0 5.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+              <path d="M17.6 14.4a5.4 5.4 0 0 1 2.6 4.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <h3 class="bento__title">We work with you, not at you</h3>
+          <p class="bento__text">
+            You see the site as it comes together, so nothing at the end is a
+            surprise.
+          </p>
+        </article>
+
+        <article class="bento__cell card reveal" data-reveal-delay="200">
+          <span class="bento__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="8.6" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M3.6 12h16.8M12 3.4c2.1 2.3 3.3 5.4 3.3 8.6S14.1 18.3 12 20.6c-2.1-2.3-3.3-5.4-3.3-8.6S9.9 5.7 12 3.4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <h3 class="bento__title">We have done this before</h3>
+          <p class="bento__text">
+            Every site we have built is live and online right now. Ask for the
+            links and go and use them yourself.
+          </p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= WHY CHOOSE US ======================= -->
+  <section class="section why" id="why-us">
+    <div class="shell">
+
+      <header class="head">
+        <p class="head__index reveal">03 — Why choose us</p>
+        <h2 class="head__title reveal" data-reveal-delay="80">
+          Because the work should be clear, honest and built to last.
+        </h2>
+        <p class="head__body reveal" data-reveal-delay="160">
+          We keep the process simple, the timelines realistic, and the website
+          working long after launch day.
+        </p>
+      </header>
+
+      <div class="why__showcase">
+        <article class="why__spotlight card reveal" data-reveal-delay="120">
+          <div class="why__spotlight-head">
+            <p class="head__index">Our craft</p>
+            <span class="why__badge">Built for performance</span>
+          </div>
+
+          <div class="why__browser" aria-hidden="true">
+            <div class="why__browser-header">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+            <div class="why__browser-body">
+              <aside class="why__browser-sidebar">
+                <span class="why__sidebar-line short"></span>
+                <span class="why__sidebar-line"></span>
+                <span class="why__sidebar-line"></span>
+                <span class="why__sidebar-line short"></span>
+              </aside>
+              <div class="why__browser-main">
+                <div class="why__mock-card large"></div>
+                <div class="why__mock-row">
+                  <span class="why__mock-card small"></span>
+                  <span class="why__mock-card small"></span>
+                </div>
+                <div class="why__mock-grid">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p class="bento__text">
+            We combine strategy, interface design and front-end engineering to build
+            sites that feel premium and perform the way businesses need them to.
+          </p>
+        </article>
+
+        <div class="why__stack">
+          <article class="why__item card reveal" data-reveal-delay="160">
+            <span class="why__index">01</span>
+            <h3 class="bento__title">Design systems that scale</h3>
+            <p class="bento__text">
+              Clean interfaces, consistent components and a structure that makes the
+              site easier to expand without breaking the experience.
+            </p>
+          </article>
+
+          <article class="why__item card reveal" data-reveal-delay="220">
+            <span class="why__index">02</span>
+            <h3 class="bento__title">Web development with discipline</h3>
+            <p class="bento__text">
+              We build with a clear structure, modern code and the technical care
+              needed for real-world performance, fast delivery and long-term use.
+            </p>
+          </article>
+
+          <article class="why__item card reveal" data-reveal-delay="280">
+            <span class="why__index">03</span>
+            <h3 class="bento__title">Performance that matters</h3>
+            <p class="bento__text">
+              Speed, responsiveness and accessibility are part of the build, not an
+              afterthought. The experience works well across devices and stays easy
+              to maintain.
+            </p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= PROCESS ======================= -->
+  <!-- Signature element: the engagement drawn as a gradient spine that fills as
+       the section scrolls through the viewport. Scroll-driven where the browser
+       supports it, one-shot on reveal where it does not. -->
+  <section class="section process" id="process">
+    <div class="shell">
+
+      <header class="head">
+        <p class="head__index reveal">03 — Process</p>
+        <h2 class="head__title reveal" data-reveal-delay="80">
+          The same four steps, whatever the size.
+        </h2>
+        <p class="head__body reveal" data-reveal-delay="160">
+          A one-page site and a large build run through exactly this. What
+          changes is how long each step takes, and we tell you that up front
+          rather than at the end.
+        </p>
+      </header>
+
+      <!-- The four steps published on stablesyntax.com. The week-by-week
+           durations that used to sit here were invented, and there is nothing
+           on the live site to replace them with — if you want them back, put in
+           real ranges and re-add <p class="phase__dur"> to each step. -->
+      <ol class="phases" id="phases">
+        <li class="phase reveal" style="--i:0">
+          <span class="phase__spine" aria-hidden="true"><span class="phase__fill"></span></span>
+          <span class="phase__dot" aria-hidden="true"></span>
+          <p class="phase__no">01</p>
+          <h3 class="phase__title">Tell us what you need</h3>
+          <p class="phase__text">
+            A conversation about the business, what the site has to do for it,
+            and who it is for. No charge, and no obligation to carry on.
+          </p>
+        </li>
+        <li class="phase reveal" data-reveal-delay="100" style="--i:1">
+          <span class="phase__spine" aria-hidden="true"><span class="phase__fill"></span></span>
+          <span class="phase__dot" aria-hidden="true"></span>
+          <p class="phase__no">02</p>
+          <h3 class="phase__title">We plan and design</h3>
+          <p class="phase__text">
+            A plan scoped to your size, and a design you see before anyone
+            writes code. You know what you are getting before we build it.
+          </p>
+        </li>
+        <li class="phase reveal" data-reveal-delay="200" style="--i:2">
+          <span class="phase__spine" aria-hidden="true"><span class="phase__fill"></span></span>
+          <span class="phase__dot" aria-hidden="true"></span>
+          <p class="phase__no">03</p>
+          <h3 class="phase__title">We build</h3>
+          <p class="phase__text">
+            Clean, current code, with regular updates as it comes together — so
+            the finished site is never the first version you have seen.
+          </p>
+        </li>
+        <li class="phase reveal" data-reveal-delay="300" style="--i:3">
+          <span class="phase__spine phase__spine--last" aria-hidden="true"><span class="phase__fill"></span></span>
+          <span class="phase__dot" aria-hidden="true"></span>
+          <p class="phase__no">04</p>
+          <h3 class="phase__title">Launch and support</h3>
+          <p class="phase__text">
+            We put it live, check it works where your customers are, and stay
+            reachable afterwards. Launch day is not the handover.
+          </p>
+        </li>
+      </ol>
+
+    </div>
+  </section>
+
+  <!-- ======================= VOICE ======================= -->
+  <section class="section voice section--bg" aria-label="What clients say">
+
+    <!-- Quieter than the other two: the quote card is the subject here, so this
+         is little more than the grid with a few marks on it. -->
+    <div class="backdrop backdrop--blueprint" aria-hidden="true">
+      <svg class="backdrop__art" viewBox="0 0 1600 900" fill="none"
+           preserveAspectRatio="xMidYMid slice">
+        <g stroke="currentColor" stroke-width="2">
+          <path d="M150 250c210 0 210 400 420 400s210-400 420-400 210 400 420 400"
+                stroke-width="1.5" opacity=".7" stroke-linecap="round"/>
+          <circle cx="150" cy="250" r="9"/>
+          <circle cx="570" cy="650" r="9"/>
+          <circle cx="990" cy="250" r="9"/>
+          <circle cx="1410" cy="650" r="9"/>
+          <rect x="1180" y="120" width="300" height="180" rx="12" opacity=".8"/>
+          <path d="M1212 176h190M1212 208h236M1212 240h150" stroke-linecap="round" opacity=".8"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="shell">
+      <figure class="voice__inner card reveal">
+        <span class="voice__quotemark" aria-hidden="true">”</span>
+        <blockquote class="voice__quote">
+          <p>
+            They shipped the design system and then taught our engineers to own
+            it. Six months on, nobody has had to ask them back to fix it.
+          </p>
+        </blockquote>
+        <figcaption class="voice__by">
+          <span class="voice__avatar" aria-hidden="true">PR</span>
+          <span>
+            <span class="voice__name">Priya Raghunathan</span>
+            <span class="voice__role">VP Product, Ledgerline</span>
+          </span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ======================= CONTACT ======================= -->
+  <section class="section contact" id="contact">
+    <div class="shell contact__grid">
+
+      <div class="contact__pitch">
+        <p class="head__index reveal">04 — Contact</p>
+        <h2 class="head__title reveal" data-reveal-delay="80">Start a project.</h2>
+        <p class="head__body reveal" data-reveal-delay="160">
+          Tell us what you are building and what is currently in the way. We
+          reply to everything within 24 hours, including the ones we turn down.
+        </p>
+
+        <!-- Contact details taken from stablesyntax.com so the two do not
+             disagree. The email is the address already in use; if you set up
+             hello@stablesyntax.com, change it here and check it actually
+             receives before this ships — a bouncing address on a live site is
+             worse than a Gmail one. -->
+        <ul class="contact__list reveal" data-reveal-delay="220">
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="m4 7 8 5.5L20 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="3.2" y="5.4" width="17.6" height="13.2" rx="2.2" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+            <a href="mailto:stablesyntax@gmail.com">stablesyntax@gmail.com</a>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6.2 3.6h3.2l1.6 4-2 1.2a10.5 10.5 0 0 0 5.2 5.2l1.2-2 4 1.6v3.2a1.6 1.6 0 0 1-1.7 1.6A15.6 15.6 0 0 1 4.6 5.3a1.6 1.6 0 0 1 1.6-1.7Z"
+                    stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            </svg>
+            <a href="tel:+2347047462360">+234 704 746 2360</a>
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="8.6" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M12 7.2V12l3.2 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Replies within 24 hours
+          </li>
+          <li>
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 21s7-5.2 7-10.4A7 7 0 0 0 5 10.6C5 15.8 12 21 12 21Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+              <circle cx="12" cy="10.4" r="2.4" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+            <!-- TODO: add the city. "Nigeria" alone is vaguer than a real
+                 studio should be about where it sits. -->
+            Nigeria — WAT (GMT+1)
+          </li>
+        </ul>
+      </div>
+
+      <!-- No backend is wired up. Submission is simulated in app.js so the
+           loading, success, and error states are all reachable. -->
+      <form class="form card reveal" data-reveal-delay="120" id="form" novalidate>
+        <div class="field">
+          <label class="field__label" for="f-name">Your name</label>
+          <input class="field__input" id="f-name" name="name" type="text"
+                 autocomplete="name" required aria-describedby="e-name">
+          <p class="field__error" id="e-name" hidden>Add your name so we know who we are replying to.</p>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="f-email">Work email</label>
+          <input class="field__input" id="f-email" name="email" type="email"
+                 autocomplete="email" required aria-describedby="h-email e-email">
+          <p class="field__help" id="h-email">We use this to reply, nothing else.</p>
+          <p class="field__error" id="e-email" hidden>Enter an email address we can reach, like you@company.com.</p>
+        </div>
+
+        <!-- Was a £25k–£100k+ budget dropdown, which is wrong twice over for a
+             Nigerian studio: wrong currency, and figures nobody had set. This is
+             the question stablesyntax.com already asks, so it needs no invented
+             numbers. Swap it back to budget whenever you have real bands in a
+             currency you actually quote in. -->
+        <div class="field">
+          <label class="field__label" for="f-timeline">Timeline</label>
+          <div class="field__selectwrap">
+            <select class="field__input field__input--select" id="f-timeline" name="timeline">
+              <option value="">Not sure yet</option>
+              <option value="1-month">Within 1 month</option>
+              <option value="3-months">Within 3 months</option>
+              <option value="6-months">Within 6 months</option>
+            </select>
+            <svg class="field__chev" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="m7 10 5 5 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <p class="field__help">It changes what we can propose, not whether we reply.</p>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="f-brief">What are you building?</label>
+          <textarea class="field__input field__input--area" id="f-brief" name="brief"
+                    rows="4" required aria-describedby="h-brief e-brief"></textarea>
+          <p class="field__help" id="h-brief">A few sentences is plenty. Links are welcome.</p>
+          <p class="field__error" id="e-brief" hidden>Tell us a little about the project so we can reply usefully.</p>
+        </div>
+
+        <button class="btn btn--primary btn--lg form__submit" type="submit" id="submit">
+          <span class="form__submit-label">Send the brief</span>
+          <svg class="btn__arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 12h13M12.5 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+
+        <p class="form__status" id="status" role="status" aria-live="polite"></p>
+      </form>
+
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="shell">
+    <div class="foot__top">
+      <a class="brand brand--foot" href="#main">
+        <img class="brand__mark" src="img/Stable%20Syntax%20Logo.png" width="1536" height="1024" alt="" aria-hidden="true">
+        <span class="brand__word">Stable&nbsp;Syntax</span>
+      </a>
+      <nav class="foot__nav" aria-label="Footer">
+        <a href="#projects">Work</a>
+        <a href="#services">Services</a>
+        <a href="#about">About</a>
+        <a href="#process">Process</a>
+        <a href="#contact">Contact</a>
+        <a href="mailto:stablesyntax@gmail.com">stablesyntax@gmail.com</a>
+      </nav>
+    </div>
+    <!-- The year stays dynamic rather than hardcoded — it renders "2026" today
+         and will not quietly go stale in January. app.js fills #year. -->
+    <p class="foot__legal">
+      © <span id="year">2026</span> Stable Syntax. All rights reserved
+    </p>
+  </div>
+</footer>
+
+<!-- Pinned to an exact version on purpose. A floating "latest" URL silently
+     breaks the scene whenever the CDN updates. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<!-- Lenis — smooth scroll, on trial. ~17KB, sets globalThis.Lenis.
+     Turn it off without editing anything by loading the page with ?lenis=off,
+     which is how the two versions are meant to be compared. app.js also skips
+     it entirely under prefers-reduced-motion. -->
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js"
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<!-- GSAP + ScrollTrigger — pinned together so scroll entrances stay in sync. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script src="scene.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
