@@ -68,7 +68,7 @@
 
 <header class="nav" id="nav">
   <div class="nav__inner shell">
-    <a class="brand" href="#main">
+    <a class="brand" href="#main" aria-label="Stable Syntax">
       <img class="brand__mark" src="img/Stable%20Syntax%20Logo.png" width="1536" height="1024" alt="" aria-hidden="true">
       <span class="brand__word">Stable&nbsp;Syntax</span>
     </a>
@@ -92,7 +92,7 @@
         <span class="u-sr" id="themebtn-text">Switch to light mode</span>
       </button>
 
-      <a class="btn btn--primary nav__cta" href="#contact">
+      <a class="btn btn--primary nav__cta" href="#contact" aria-label="Start a project">
         <span>Start a project</span>
         <svg class="btn__arrow" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M5 12h13M12.5 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
@@ -897,22 +897,90 @@
     </div>
 
     <div class="shell">
-      <figure class="voice__inner card reveal">
-        <span class="voice__quotemark" aria-hidden="true">”</span>
-        <blockquote class="voice__quote">
-          <p>
-            They shipped the design system and then taught our engineers to own
-            it. Six months on, nobody has had to ask them back to fix it.
-          </p>
-        </blockquote>
-        <figcaption class="voice__by">
-          <span class="voice__avatar" aria-hidden="true">PR</span>
-          <span>
-            <span class="voice__name">Priya Raghunathan</span>
-            <span class="voice__role">VP Product, Ledgerline</span>
-          </span>
-        </figcaption>
-      </figure>
+      <div class="voice__carousel reveal" data-voice-carousel role="region"
+           aria-label="Client testimonials" aria-roledescription="carousel">
+        <button class="iconbtn voice__control voice__control--prev" type="button"
+                aria-label="Previous testimonial" aria-controls="voice-track" disabled>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M19 12H5m6 7-7-7 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="voice__viewport" id="voice-track" data-voice-viewport>
+          <div class="voice__track">
+            <figure class="voice__inner card" role="group" aria-roledescription="slide" aria-label="1 of 4">
+              <span class="voice__quotemark" aria-hidden="true">”</span>
+              <blockquote class="voice__quote">
+                <p>
+                  They shipped the design system and then taught our engineers to own
+                  it. Six months on, nobody has had to ask them back to fix it.
+                </p>
+              </blockquote>
+              <figcaption class="voice__by">
+                <span class="voice__avatar" aria-hidden="true">PR</span>
+                <span>
+                  <span class="voice__name">Priya Raghunathan</span>
+                  <span class="voice__role">VP Product, Ledgerline</span>
+                </span>
+              </figcaption>
+            </figure>
+            <figure class="voice__inner card" role="group" aria-roledescription="slide" aria-label="2 of 4">
+              <span class="voice__quotemark" aria-hidden="true">”</span>
+              <blockquote class="voice__quote">
+                <p>
+                  From the first conversation, they understood what our business
+                  needed. The new site feels like us, only clearer.
+                </p>
+              </blockquote>
+              <figcaption class="voice__by">
+                <span class="voice__avatar" aria-hidden="true">ML</span>
+                <span>
+                  <span class="voice__name">Morgan Lee</span>
+                  <span class="voice__role">Founder, Northform</span>
+                </span>
+              </figcaption>
+            </figure>
+            <figure class="voice__inner card" role="group" aria-roledescription="slide" aria-label="3 of 4">
+              <span class="voice__quotemark" aria-hidden="true">”</span>
+              <blockquote class="voice__quote">
+                <p>
+                  Every question got a thoughtful answer, and the finished site is
+                  easy for our team to update.
+                </p>
+              </blockquote>
+              <figcaption class="voice__by">
+                <span class="voice__avatar" aria-hidden="true">DO</span>
+                <span>
+                  <span class="voice__name">Daniel Okafor</span>
+                  <span class="voice__role">Operations Director, Fieldnote</span>
+                </span>
+              </figcaption>
+            </figure>
+            <figure class="voice__inner card" role="group" aria-roledescription="slide" aria-label="4 of 4">
+              <span class="voice__quotemark" aria-hidden="true">”</span>
+              <blockquote class="voice__quote">
+                <p>
+                  They made a complicated launch feel manageable. The site is
+                  faster, clearer, and built around how our customers work.
+                </p>
+              </blockquote>
+              <figcaption class="voice__by">
+                <span class="voice__avatar" aria-hidden="true">AC</span>
+                <span>
+                  <span class="voice__name">Alex Chen</span>
+                  <span class="voice__role">Managing Director, Tandem Freight</span>
+                </span>
+              </figcaption>
+            </figure>
+          </div>
+        </div>
+        <button class="iconbtn voice__control voice__control--next" type="button"
+                aria-label="Next testimonial" aria-controls="voice-track">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 12h14m-6-7 7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <span class="u-sr" data-voice-status aria-live="polite">Testimonial 1 of 4</span>
+      </div>
     </div>
   </section>
 
@@ -967,9 +1035,8 @@
         </ul>
       </div>
 
-      <!-- No backend is wired up. Submission is simulated in app.js so the
-           loading, success, and error states are all reachable. -->
-      <form class="form card reveal" data-reveal-delay="120" id="form" novalidate>
+      <form class="form card reveal" data-reveal-delay="120" id="form"
+            action="https://formspree.io/f/mppqrlpr" method="POST" novalidate>
         <div class="field">
           <label class="field__label" for="f-name">Your name</label>
           <input class="field__input" id="f-name" name="name" type="text"

@@ -403,6 +403,40 @@
     track.appendChild(copy);
   });
 
+  /* ------------------------------------------------------ testimonials */
+
+  document.querySelectorAll('[data-voice-carousel]').forEach(function (carousel) {
+    var viewport = carousel.querySelector('[data-voice-viewport]');
+    var slides = Array.prototype.slice.call(carousel.querySelectorAll('.voice__inner'));
+    var previous = carousel.querySelector('.voice__control--prev');
+    var next = carousel.querySelector('.voice__control--next');
+    var status = carousel.querySelector('[data-voice-status]');
+    if (!viewport || !slides.length || !previous || !next) return;
+
+    var activeIndex = 0;
+    var update = function () {
+      var index = Math.round(viewport.scrollLeft / viewport.clientWidth);
+      index = Math.max(0, Math.min(slides.length - 1, index));
+      if (index === activeIndex && status) return;
+      activeIndex = index;
+      previous.disabled = index === 0;
+      next.disabled = index === slides.length - 1;
+      if (status) status.textContent = 'Testimonial ' + (index + 1) + ' of ' + slides.length;
+    };
+    var scrollToSlide = function (index) {
+      viewport.scrollTo({
+        left: slides[index].offsetLeft,
+        behavior: reduced ? 'auto' : 'smooth'
+      });
+    };
+
+    previous.addEventListener('click', function () { scrollToSlide(activeIndex - 1); });
+    next.addEventListener('click', function () { scrollToSlide(activeIndex + 1); });
+    viewport.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  });
+
   /* ---------------------------------------------------- parallax fallback */
 
   /* Where the browser has scroll-driven animations, styles.css already runs the
@@ -668,11 +702,22 @@
       });
     });
 
-    // Replace this with a real request. The rejection path below is what a
-    // failed one lands in.
     function send(payload) {
-      return new Promise(function (resolve) {
-        window.setTimeout(function () { resolve(payload); }, 900);
+      return fetch(form.action, {
+        method: 'POST',
+        body: payload,
+        headers: { Accept: 'application/json' }
+      }).then(function (response) {
+        if (response.ok) return response;
+
+        return response.json().then(function (data) {
+          var messages = Array.isArray(data.errors)
+            ? data.errors.map(function (item) { return item.message; }).filter(Boolean)
+            : [];
+          throw new Error(messages.join(' ') || data.error || 'Formspree rejected the submission.');
+        }, function () {
+          throw new Error('Formspree rejected the submission.');
+        });
       });
     }
 
@@ -694,14 +739,17 @@
       status.textContent = '';
       delete status.dataset.tone;
 
-      send(Object.fromEntries(new FormData(form)))
+      send(new FormData(form))
         .then(function () {
           form.reset();
           status.textContent = 'Sent. We reply within 24 hours.';
           status.dataset.tone = 'ok';
         })
-        .catch(function () {
-          status.textContent = 'That did not send. Try again, or write to stablesyntax@gmail.com.';
+        .catch(function (error) {
+          var message = error.message && error.message !== 'Failed to fetch'
+            ? error.message
+            : 'That did not send.';
+          status.textContent = message + ' Try again, or write to stablesyntax@gmail.com.';
           status.dataset.tone = 'bad';
         })
         .then(function () {

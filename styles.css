@@ -529,6 +529,12 @@ img { max-width: 100%; display: block; height: auto; }
   .nav__cta { padding: 0; width: 48px; }
 }
 
+@media (max-width: 390px) {
+  .nav__inner { gap: 12px; }
+  .nav__end { gap: 8px; }
+  .brand__word { display: none; }
+}
+
 /* ------------------------------------------------------------------ hero */
 
 .hero {
@@ -1451,6 +1457,36 @@ img { max-width: 100%; display: block; height: auto; }
 
 /* ----------------------------------------------------------------- voice */
 
+.voice__carousel {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  gap: clamp(12px, 2vw, 24px);
+  align-items: center;
+  max-width: 1080px;
+  margin-inline: auto;
+}
+
+.voice__viewport {
+  grid-column: 2;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  overscroll-behavior-inline: contain;
+  touch-action: pan-x;
+}
+.voice__viewport::-webkit-scrollbar { display: none; }
+
+.voice__track { display: flex; align-items: stretch; }
+.voice__track > .voice__inner { box-sizing: border-box; flex: 0 0 100%; min-width: 0; scroll-snap-align: start; }
+
+.voice__control { grid-row: 1; }
+.voice__control--prev { grid-column: 1; }
+.voice__control--next { grid-column: 3; }
+.voice__control svg { width: 20px; height: 20px; }
+.voice__control:disabled { opacity: 0.4; cursor: not-allowed; }
+
 .voice__inner {
   max-width: 940px; margin-inline: auto;
   padding: clamp(32px, 4.5vw, 64px);
@@ -1493,6 +1529,15 @@ img { max-width: 100%; display: block; height: auto; }
 
 .voice__name { display: block; font-weight: 600; font-size: 0.98rem; }
 .voice__role { display: block; color: var(--muted); font-size: 0.9rem; }
+
+@media (max-width: 680px) {
+  .voice__carousel { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 12px 8px; }
+  .voice__viewport { grid-column: 1 / -1; grid-row: 2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice__viewport { scroll-behavior: auto; }
+}
 
 /* --------------------------------------------------------------- contact */
 

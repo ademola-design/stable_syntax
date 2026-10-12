@@ -191,9 +191,9 @@
 
   if ('ResizeObserver' in window) {
     new ResizeObserver(resize).observe(hero);
-  } else {
-    window.addEventListener('resize', resize, { passive: true });
   }
+  window.addEventListener('resize', resize, { passive: true });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(resize);
 
   /* --------------------------------------------------------------- loop */
 
