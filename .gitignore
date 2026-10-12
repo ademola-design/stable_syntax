@@ -1,0 +1,10 @@
+# Local-only settings and secrets
+.claude/settings.local.json
+**/.env
+
+# Generated files and nested repository metadata
+**/node_modules/
+**/.next/
+**/.git/
+.DS_Store
+Thumbs.db
